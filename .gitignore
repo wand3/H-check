@@ -7,3 +7,4 @@ app/main/__py*/
 app/schemas/__py*/
 app/services/__py*/
 app/tests/__py*/
+frontend/node_modules
