@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "Oswald";
+  src: url("../fonts/Oswald/Oswald-VariableFont_wght.ttf");
+}
+@font-face {
+  font-family: "Iceberg-Regular";
+  src: url("../fonts/Iceberg/Iceberg-Regular.ttf")
+}
+@font-face {
+  font-family: "Electrolize";
+  src: url("../fonts/Electrolize/Electrolize-Regular.ttf")
+}
+
+@layer base {
+  :root {
+  --color-bg1: rgb(108, 0, 162) 
+  --color-bg2: #001152; /* rgb(0, 17, 82) converted to hex */
+  --color1: rgb(18, 113, 255) /* converted to hex */
+  --color2: #dd4aff; /* rgb(221, 74, 255) converted to hex */
+  --color3: #64dcff; /* rgb(100, 220, 255) converted to hex */
+  --color4: #c83232; /* rgb(200, 50, 50) converted to hex */
+  --color5: #b4b432; /* rgb(180, 180, 50) converted to hex */
+  --color-interactive: #826b52e8; /* rgb(140, 100, 255) converted to hex */
+  --circle-size: 80%;
+  --blending: hard-light;
+  --size-desktop--21: 1.1rem;
+  }
+}
+
+* {
+  scroll-behavior: smooth
+}
