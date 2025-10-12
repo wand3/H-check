@@ -1,1 +1,9 @@
-
+.env
+.idea
+__pycache__
+app/database/__py*/
+app/models/__py*/
+app/main/__py*/
+app/schemas/__py*/
+app/services/__py*/
+app/tests/__py*/
