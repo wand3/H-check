@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional
-from webapp.schemas.user import UserBase
+from app.schemas.user import UserBase
 
 class Token(BaseModel):
     user: UserBase

@@ -1,64 +1,64 @@
 from typing import AsyncGenerator
 from ..config import Config
 from fastapi import FastAPI
-from pymongo import AsyncMongoClient
 import logging
 from contextlib import asynccontextmanager
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+import asyncpg
 
+Base = declarative_base()
 
-# MongoDB's connection string (localhost, no authentication)
-# MONGO_CONNECTION_STRING = "mongodb://127.0.0.1:27017/"
-MONGO_CONNECTION_STRING = Config.DATABASE_URI
-DATABASE_NAME = "H-check"
-# Load the MongoDB connection string from the environment variable MONGODB_URI
+# Async engine for FastAPI
+async_engine = create_async_engine(
+    Config.DATABASE_URL,
+    echo=True,  # Set to False in production
+    future=True
+)
 
-# Create a MongoDB client
-client = AsyncMongoClient(MONGO_CONNECTION_STRING)
-db = client["check"]
+# Sync engine for Alembic migrations
+sync_engine = create_engine(
+    Config.SYNC_DATABASE_URL,
+    echo=True
+)
 
+# Session makers
+AsyncSessionLocal = sessionmaker(
+    bind=async_engine,
+    class_=AsyncSession,
+    expire_on_commit=False
+)
 
-@asynccontextmanager
-async def db_lifespan(app: FastAPI):
-    # Startup
-    app.mongodb_client = AsyncMongoClient(MONGO_CONNECTION_STRING)
-    app.database = app.mongodb_client.get_default_database(DATABASE_NAME)
-    ping_response = await app.database.command("ping")
-    if int(ping_response["ok"]) != 1:
-        raise Exception("Problem connecting to database cluster.")
-    else:
-        logging.info("Connected to database cluster.")
+SyncSessionLocal = sessionmaker(
+    bind=sync_engine,
+    autocommit=False,
+    autoflush=False
+)
 
-    yield
+# Dependency for FastAPI
+async def get_db():
+    async with AsyncSessionLocal() as session:
+        try:
+            yield session
+        finally:
+            await session.close()
 
-    # Shutdown
-    await app.mongodb_client.close()
+# Initialize database
+async def init_db():
+    async with async_engine.begin() as conn:
+        # For development - creates all tables
+        # In production, use Alembic migrations instead
+        # from models import Base
+        await conn.run_sync(Base.metadata.create_all)
 
-# Create a global client instance (do this ONCE at application startup)
-# client: AsyncMongoClient = None
-
-
-async def connect_to_mongo():
-    global client
-    if client is None:
-        client = AsyncMongoClient(MONGO_CONNECTION_STRING)
-
-
-async def close_mongo_connection():
-    global client
-    if client:
-        await client.close()
-
-
-async def get_db() -> AsyncGenerator:
-    """
-    Asynchronous dependency injection for MongoDB database.
-    """
-    if client is None:
-        raise RuntimeError("MongoDB client not initialized. Call connect_to_mongo() on startup.")
+# Test database connection
+async def test_db_connection():
     try:
-        # db = client['ethos']  # Gets the default database from the URI
-        yield db
+        async with AsyncSessionLocal() as session:
+            await session.execute("SELECT 1")
+        return True
     except Exception as e:
-        raise f'{e}' # Re-raise the exception to be handled by FastAPI
-    finally:
-        pass # Motor handles connect
+        print(f"Database connection error: {e}")
+        return False
