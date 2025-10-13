@@ -5,7 +5,7 @@ const Home = () => {
     return (
         <> 
             <HBody nav={false}>
-              <h1 className='text-md text-center text-black'>Homepage success</h1>
+              <h1 className='text-lg text-center text-white'>Homepage success</h1>
             </HBody>
         </>
     )

@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 from typing import List, Annotated
 from app.logger import logger
 from fastapi import APIRouter, Depends, HTTPException, status, Query
@@ -45,15 +46,12 @@ async def process_query(
         execution_time = int((datetime.now() - start_time).total_seconds() * 1000)
 
         # # Log the query
-        # await processor.log_query(
-        #     user_id=current_user.id,
-        #     natural_language_query=query_data['query'],
-        #     fhir_query=fhir_query['fhir_url'],
-        #     fhir_response=fhir_response,
-        #     processed_results=processed_results,
-        #     execution_time=execution_time
-        # )
-
+        logger.info(f'natural_language_query={query_data["query"]}, '
+                    f"fhir_query={fhir_query['fhir_url']}, "
+                    f"fhir_response={fhir_response}, "
+                    f"processed_results={processed_results}, "
+                    f"execution_time={execution_time}"
+                    )
 
         return {
             "original_query": query_data['query'],
@@ -76,10 +74,9 @@ async def get_suggestions():
         ]
     }
 
-
 @main.get("/health")
 async def health_check(db: AsyncSession = Depends(get_db)):
-    from database import test_db_connection
+    from app.database.db_engine import test_db_connection
     db_status = await test_db_connection()
     return {
         "status": "healthy",

@@ -1,7 +1,7 @@
 import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import h_check_router
+from app.routes import h_check_router, auth_router, user_router
 import uvicorn
 from app.database.db_engine import get_db, init_db
 from .logger import logger
@@ -28,6 +28,8 @@ def create_app() -> FastAPI:
     )
     # Include routes
     app.include_router(h_check_router, tags=["FHIR"])
+    app.include_router(auth_router)
+    app.include_router(user_router)
 
 
     return app
