@@ -5,6 +5,7 @@ An AI-powered healthcare data querying tool that interfaces with FHIR-compliant 
 - Python
 - Fastapi
 - spacy
+- Postgresql
 - Typescript
 - Vite
 - React
@@ -15,6 +16,10 @@ An AI-powered healthcare data querying tool that interfaces with FHIR-compliant 
 👉 **State Management**: Context and Redux for state management.
 
 👉 **TDD**: Test driven development
+👉 **AI Integration** : NLP query understanding and AI-powered suggestions
+
+#NB
+due to time constraints I'd continuously commit to the repo till every point is aced exceptionally 
 
 ## <a name="quick-start">🤸 Quick Start</a>
 
