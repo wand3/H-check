@@ -15,16 +15,19 @@ from app.schemas.forms import UserImageUpdateForm
 from app.schemas.user import UserBase, UserUpdate, UserInDB
 from app.models.user import get_current_active_user, UserModel
 
-from app.database.db_engine import get_db
+# from app.database.db_engine import get_db
+from app.database.db_engine import get_session
 
 
 router = APIRouter(prefix="/user", tags=["User"])
+SessionDep = Annotated[Session, Depends(get_session)]
 
 # curr_user = UserModel(get_db())  # for class injection
 
 
 @router.get("/me", response_model=None)
 async def read_user_me(
+    session: SessionDep,
     current_user: UserBase = Depends(get_current_active_user),
 ):
     try:

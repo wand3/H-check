@@ -7,7 +7,7 @@ from starlette.responses import JSONResponse
 from app.schemas.auth import Token
 from app.schemas.user import UserBase, UserCreate, UserInDB
 from app.models.user import UserModel
-from app.database.db_engine import get_db
+from app.database.db_engine import get_session
 from app.logger import logger
 from ..config import Config
 
@@ -16,7 +16,7 @@ auth = APIRouter(tags=["Auth"])
 
 def get_user_model() -> UserModel:
     """Dependency to inject a `UserModel` instance."""
-    return UserModel(get_db)
+    return UserModel(get_session)
 
 
 @auth.post("/token", response_model=Token)

@@ -3,14 +3,14 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes import h_check_router, auth_router, user_router
 import uvicorn
-from app.database.db_engine import get_db, init_db
+from app.database.db_engine import get_session, create_db_and_tables
 from .logger import logger
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 
 
 def create_app() -> FastAPI:
-    app: FastAPI = FastAPI(db_lifespan=get_db())
+    app: FastAPI = FastAPI(db_lifespan=get_session())
     logger.info(f'Application started -----------')
 
 
@@ -31,16 +31,13 @@ def create_app() -> FastAPI:
     app.include_router(auth_router)
     app.include_router(user_router)
 
-
     return app
-
 
 app = create_app()
 # Startup event
 @app.on_event("startup")
-async def startup_event():
-    await init_db()
-    print("Database initialized")
+def on_startup():
+    create_db_and_tables()
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)

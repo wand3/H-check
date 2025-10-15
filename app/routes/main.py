@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import List, Annotated
 from app.logger import logger
 from fastapi import APIRouter, Depends, HTTPException, status, Query
-from app.database.db_engine import get_db
+from app.database.db_engine import get_session
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.nlp.fhir_nlp_service import FHIRQueryProcessor
 
@@ -25,7 +25,7 @@ async def root():
 @main.post("/query")
 async def process_query(
         query_data: dict,
-        db: AsyncSession = Depends(get_db),
+        db: AsyncSession = Depends(get_session),
 ):
     from datetime import datetime
     start_time = datetime.now()
@@ -75,7 +75,7 @@ async def get_suggestions():
     }
 
 @main.get("/health")
-async def health_check(db: AsyncSession = Depends(get_db)):
+async def health_check(db: AsyncSession = Depends(get_session)):
     from app.database.db_engine import test_db_connection
     db_status = await test_db_connection()
     return {
