@@ -2,20 +2,18 @@ import logging
 import os
 import shutil
 from datetime import datetime
-
 from bson import ObjectId
 from fastapi import APIRouter, Depends, HTTPException, status, Form
 from fastapi.encoders import jsonable_encoder
 from typing import Annotated, Optional
-
+from sqlmodel import Field, Session
 from app.logger import logger
 from app.config import Config
-from app.routes.auth import get_user_model
 from app.schemas.forms import UserImageUpdateForm
 from app.schemas.user import UserBase, UserUpdate, UserInDB
-from app.models.user import get_current_active_user, UserModel
-
-# from app.database.db_engine import get_db
+from app.dependencies import get_current_active_user, get_current_user
+from app.models.user import UserModel
+from sqlalchemy.ext.asyncio import AsyncSession
 from app.database.db_engine import get_session
 
 
@@ -69,7 +67,7 @@ async def update_user(
 @router.put("/{user_id}/add/image", response_model=UserInDB, status_code=status.HTTP_201_CREATED)
 async def update_user_image(
         user_id: str,
-        user_model: Annotated[UserModel, Depends(get_db())],
+        user_model: Annotated[UserModel, Depends(get_session)],
         user_data: Annotated[UserImageUpdateForm, Form()]
 ):
     try:

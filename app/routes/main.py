@@ -24,7 +24,7 @@ async def root():
 
 @main.post("/query")
 async def process_query(
-        query_data: dict,
+        query_data: str,
         db: AsyncSession = Depends(get_session),
 ):
     from datetime import datetime

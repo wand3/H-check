@@ -5,13 +5,13 @@ import logging
 from contextlib import asynccontextmanager
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 import asyncpg
+from sqlalchemy import text
 from sqlalchemy.orm import sessionmaker
 from sqlmodel import SQLModel
 
 
-connect_args = {"check_same_thread": False}
+# connect_args = {"check_same_thread": False}
 engine = create_async_engine(Config.DATABASE_URL,
-                             connect_args=connect_args,
                              echo=True)
 
 # Create a new async "sessionmaker"
@@ -39,12 +39,12 @@ async def get_session() -> AsyncSession:
     finally:
         await async_session.close()
 
-# # Test database connection
-# async def test_db_connection():
-#     try:
-#         async with AsyncSessionLocal() as session:
-#             await session.execute("SELECT 1")
-#         return True
-#     except Exception as e:
-#         print(f"Database connection error: {e}")
-#         return False
+# Test database connection
+async def test_db_connection():
+    try:
+        async with AsyncSessionLocal() as session:
+            await session.execute(text("SELECT 1"))
+        return True
+    except Exception as e:
+        print(f"Database connection error: {e}")
+        return False

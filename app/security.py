@@ -1,10 +1,11 @@
 from datetime import datetime, timedelta
 from typing import Optional
-
+from sqlalchemy.ext.asyncio import AsyncSession
+from app.schemas.user import UserInDB
 from jose import jwt, JWTError
 from passlib.context import CryptContext
 
-from config import Config
+from .config import Config
 
 # Setup password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

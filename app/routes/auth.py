@@ -8,6 +8,8 @@ from app.schemas.auth import Token
 from app.schemas.user import UserBase, UserCreate, UserInDB
 from app.models.user import UserModel
 from app.database.db_engine import get_session
+from app.services.user_services import get_user_by_username, get_user_by_id, get_user_by_email
+from app.security import authenticate_user
 from app.logger import logger
 from ..config import Config
 
@@ -26,7 +28,7 @@ async def login_for_access_token(
 ) -> Token:
     """Authenticate user and issue a JWT access token."""
     # Call the instance method using the injected user_model
-    user = await user_model.authenticate_user(self=user_model, username=form_data.username, password=form_data.password)
+    user = await authenticate_user(self=user_model, username=form_data.username, password=form_data.password)
     # logger.info(user)
     # user = UserInDB(user)
     # user_list = [us for us in user]

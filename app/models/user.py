@@ -12,16 +12,18 @@ from ..config import Config
 from jose import jwt, JWTError
 from sqlalchemy.dialects.postgresql import UUID
 from sqlmodel import Field, Session, SQLModel, create_engine, select, Relationship, Column, Text, JSON
-# from sqlalchemy import Column
 
 
 class UserModel(SQLModel, table=True):
+    __tablename__ = "users"
+
     # Use type hints and Field for column definitions
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, index=True)
     email: str = Field(unique=True, index=True)
     hashed_password: str
-    full_name: Optional[str] = Field(default=None)
+    username: Optional[str] = Field(default=None)
     disabled: bool = Field(default=False)
+    profile_pic: str
 
     # Use default_factory for values generated at creation time
     created_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)
@@ -54,9 +56,3 @@ class QueryLog(SQLModel, table=True):
 
     # Relationship to User
     user: UserModel = Relationship(back_populates="query_logs")
-
-async def get_current_active_user(current_user: Annotated[UserBase, Depends(UserModel.get_current_user)]):
-    # logger.info(f'User model ---- get current  active user payload error {current_user}')
-    if current_user.disabled:
-        raise HTTPException(status_code=400, detail="Inactive user")
-    return current_user

@@ -12,36 +12,22 @@ class UserBase(BaseModel):
     profile_pic: Optional[str] = None
 
     class Config:
-        from_attributes = True
-        # json_encoders = {
-        #     ObjectId: str
-        # }
-        json_schema_extra = {
-            "example": {
-                "username": "john_doe",
-                "email": "john_doe@example.com",
-                "disabled": "false",
-                "profile_pic": "image.jpg"
-
-            }
-        }
+        from_attributes = True  # <-- allows .from_orm() and response_model conversion
 
 
 class UserInDB(UserBase):
-    id: Optional[PyObjectId] = Field(alias="_id", default=None)  # Alias _id to id
+    # id: Optional[PyObjectId] = Field(alias="_id", default=None)  # Alias _id to id
     # hashed_password: str
     created_at: datetime
     updated_at: datetime
 
-    @field_validator("id")
-    def convert_objectid_to_str(cls, v):
-        if isinstance(v, ObjectId):
-            return str(v)
+    # @field_validator("id")
+    # def convert_objectid_to_str(cls, v):
+    #     if isinstance(v, ObjectId):
+    #         return str(v)
 
     class Config:
-        json_encoders = {
-            ObjectId: str
-        }
+        from_attributes = True  # <-- allows .from_orm() and response_model conversion
 
 
 class UserCreate(UserBase):

@@ -36,8 +36,8 @@ def create_app() -> FastAPI:
 app = create_app()
 # Startup event
 @app.on_event("startup")
-def on_startup():
-    create_db_and_tables()
+async def on_startup():
+    await create_db_and_tables()
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)

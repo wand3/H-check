@@ -2,8 +2,8 @@ import uuid
 from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select, func
-from app.models import UserModel
-from security import hash_password
+from app.models.user import UserModel
+from app.security import hash_password
 from passlib.context import CryptContext
 from typing import Optional, Annotated, AsyncGenerator
 from fastapi import Depends, HTTPException, status
@@ -12,7 +12,7 @@ from ..schemas.user import UserInDB, UserCreate, UserUpdate, UserBase
 from ..schemas.auth import TokenData
 from ..config import Config
 from jose import jwt, JWTError
-from app.database.db_engine import get_db
+from app.database.db_engine import get_session
 from ..security import hash_password
 
 async def create_user(db: AsyncSession, user_data: UserCreate) -> UserModel:
