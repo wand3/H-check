@@ -3,6 +3,7 @@ from fastapi.testclient import TestClient
 from unittest.mock import Mock, AsyncMock, patch, MagicMock
 from datetime import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
+from .conftest import async_client
 
 # Assuming your main FastAPI app is in app/main.py
 from app.main import app
@@ -13,8 +14,8 @@ class TestRoutes:
     """Test cases for FastAPI routes"""
 
     @pytest.fixture
-    def client(self):
-        """Create test client"""
+    def async_client(self):
+        """Create test async_client"""
         return TestClient(app)
 
     @pytest.fixture
@@ -83,12 +84,12 @@ class TestRoutes:
 
     # Test POST /query
     @pytest.mark.asyncio
-    async def test_process_query_success(self, client, mock_db, sample_query_data,
+    async def test_process_query_success(self, async_client, mock_db, sample_query_data,
                                          sample_fhir_query, sample_fhir_response,
                                          sample_processed_results):
         """Test successful query processing"""
         # Mock the dependencies
-        with patch('app.database.db_engine.get_db', return_value=mock_db), \
+        with patch('app.database.db_engine.get_session', return_value=mock_db), \
                 patch('app.nlp.fhir_nlp_service.FHIRQueryProcessor') as MockProcessor:
             # Setup mocks
             mock_processor_instance = AsyncMock()
@@ -106,7 +107,7 @@ class TestRoutes:
             # mock_now.__sub__ = Mock(return_value=Mock(total_seconds=Mock(return_value=1.5)))
 
             # Make request
-            response = client.post("/query", json=sample_query_data)
+            response = async_client.post("/query", json=sample_query_data)
 
             # Assertions
             assert response.status_code == 200
@@ -126,23 +127,23 @@ class TestRoutes:
             mock_processor_instance.log_query.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_process_query_missing_query_field(self, client):
+    async def test_process_query_missing_query_field(self, async_client):
         """Test query processing with missing query field"""
-        response = client.post("/query", json={})
+        response = async_client.post("/query", json={})
 
         assert response.status_code == 422  # Validation error
 
     @pytest.mark.asyncio
-    async def test_process_query_empty_query(self, client):
+    async def test_process_query_empty_query(self, async_client):
         """Test query processing with empty query"""
-        response = client.post("/query", json={"query": ""})
+        response = async_client.post("/query", json={"query": ""})
 
         assert response.status_code == 422  # Validation error
 
     @pytest.mark.asyncio
-    async def test_process_query_fhir_server_error(self, client, mock_db, sample_query_data):
+    async def test_process_query_fhir_server_error(self, async_client, mock_db, sample_query_data):
         """Test query processing when FHIR server fails"""
-        with patch('app.database.db_engine.get_db', return_value=mock_db), \
+        with patch('app.database.db_engine.get_session', return_value=mock_db), \
                 patch('app.nlp.fhir_nlp_service.FHIRQueryProcessor') as MockProcessor:
             mock_processor_instance = AsyncMock()
             MockProcessor.return_value = mock_processor_instance
@@ -151,15 +152,15 @@ class TestRoutes:
             mock_processor_instance.build_fhir_query.return_value = {"fhir_url": "test"}
             mock_processor_instance.execute_fhir_query.side_effect = Exception("FHIR server unavailable")
 
-            response = client.post("/query", json=sample_query_data)
+            response = async_client.post("/query", json=sample_query_data)
 
             assert response.status_code == 500
             assert "FHIR server unavailable" in response.json()["detail"]
 
     @pytest.mark.asyncio
-    async def test_process_query_processor_error(self, client, mock_db, sample_query_data):
+    async def test_process_query_processor_error(self, async_client, mock_db, sample_query_data):
         """Test query processing when processor fails"""
-        with patch('app.database.db_engine.get_db', return_value=mock_db), \
+        with patch('app.database.db_engine.get_session', return_value=mock_db), \
                 patch('app.nlp.fhir_nlp_service.FHIRQueryProcessor') as MockProcessor:
             mock_processor_instance = AsyncMock()
             MockProcessor.return_value = mock_processor_instance
@@ -167,17 +168,17 @@ class TestRoutes:
             # Simulate processor error
             mock_processor_instance.build_fhir_query.side_effect = Exception("Processor error")
 
-            response = client.post("/query", json=sample_query_data)
+            response = async_client.post("/query", json=sample_query_data)
 
             assert response.status_code == 500
             assert "Processor error" in response.json()["detail"]
 
     @pytest.mark.asyncio
-    async def test_process_query_logging_error(self, client, mock_db, sample_query_data,
+    async def test_process_query_logging_error(self, async_client, mock_db, sample_query_data,
                                                sample_fhir_query, sample_fhir_response,
                                                sample_processed_results):
         """Test query processing when logging fails but main request succeeds"""
-        with patch('app.database.db_engine.get_db', return_value=mock_db), \
+        with patch('app.database.db_engine.get_session', return_value=mock_db), \
                 patch('app.nlp.fhir_nlp_service.FHIRQueryProcessor') as MockProcessor:
             mock_processor_instance = AsyncMock()
             MockProcessor.return_value = mock_processor_instance
@@ -194,15 +195,15 @@ class TestRoutes:
             mock_now.__sub__ = Mock(return_value=Mock(total_seconds=Mock(return_value=1.5)))
 
             # Should still return 200 even if logging fails
-            response = client.post("/query", json=sample_query_data)
+            response = async_client.post("/query", json=sample_query_data)
 
             assert response.status_code == 200
             # Logging error should be handled gracefully
 
     # Test GET /suggestions
-    def test_get_suggestions_success(self, client):
+    def test_get_suggestions_success(self, async_client):
         """Test successful suggestions retrieval"""
-        response = client.get("/suggestions")
+        response = async_client.get("/suggestions")
 
         assert response.status_code == 200
 
@@ -217,9 +218,9 @@ class TestRoutes:
         assert any("asthma" in suggestion.lower() for suggestion in suggestions)
         assert any("hypertension" in suggestion.lower() for suggestion in suggestions)
 
-    def test_get_suggestions_content(self, client):
+    def test_get_suggestions_content(self, async_client):
         """Test suggestions content"""
-        response = client.get("/suggestions")
+        response = async_client.get("/suggestions")
         response_data = response.json()
 
         suggestions = response_data["suggestions"]
@@ -231,12 +232,12 @@ class TestRoutes:
 
     # Test GET /health
     @pytest.mark.asyncio
-    async def test_health_check_success(self, client, mock_db):
+    async def test_health_check_success(self, async_client, mock_db):
         """Test successful health check with database connected"""
-        with patch('app.main.get_db', return_value=mock_db), \
-                patch('app.main.test_db_connection', AsyncMock(return_value=True)):
+        with patch('app.database.db_engine.get_session', return_value=mock_db), \
+                patch('app.database.db_engine.test_db_connection', AsyncMock(return_value=True)):
 
-            response = client.get("/health")
+            response = async_client.get("/health")
 
             assert response.status_code == 200
 
@@ -252,11 +253,11 @@ class TestRoutes:
                 pytest.fail("Timestamp is not in valid ISO format")
 
     @pytest.mark.asyncio
-    async def test_health_check_database_disconnected(self, client, mock_db):
+    async def test_health_check_database_disconnected(self, async_client, mock_db):
         """Test health check when database is disconnected"""
-        with patch('app.main.get_db', return_value=mock_db), \
-                patch('app.main.test_db_connection', AsyncMock(return_value=False)):
-            response = client.get("/health")
+        with patch('app.database.db_engine.get_session', return_value=mock_db), \
+                patch('app.database.db_engine.test_db_connection', AsyncMock(return_value=False)):
+            response = async_client.get("/health")
 
             assert response.status_code == 200
 
@@ -266,11 +267,11 @@ class TestRoutes:
             assert "timestamp" in response_data
 
     @pytest.mark.asyncio
-    async def test_health_check_database_error(self, client, mock_db):
+    async def test_health_check_database_error(self, async_client, mock_db):
         """Test health check when database check raises an error"""
-        with patch('app.main.get_db', return_value=mock_db), \
-                patch('app.main.test_db_connection', AsyncMock(side_effect=Exception("DB error"))):
-            response = client.get("/health")
+        with patch('app.database.db_engine.get_session', return_value=mock_db), \
+                patch('app.database.db_engine.test_db_connection', AsyncMock(side_effect=Exception("DB error"))):
+            response = async_client.get("/health")
 
             # Should handle database errors gracefully
             assert response.status_code == 200
@@ -279,7 +280,7 @@ class TestRoutes:
 
     # Test Authentication/Authorization (if applicable)
     @pytest.mark.asyncio
-    async def test_process_query_unauthorized(self, client, sample_query_data):
+    async def test_process_query_unauthorized(self, async_client, sample_query_data):
         """Test query processing without authentication"""
         # This test depends on how your auth is set up
         # If authentication is required and not provided, it should return 401
@@ -287,13 +288,13 @@ class TestRoutes:
 
     # Test Performance
     @pytest.mark.asyncio
-    async def test_process_query_performance(self, client, mock_db, sample_query_data,
+    async def test_process_query_performance(self, async_client, mock_db, sample_query_data,
                                              sample_fhir_query, sample_fhir_response,
                                              sample_processed_results):
         """Test query processing performance timing"""
-        with patch('app.main.get_db', return_value=mock_db), \
-                patch('app.main.FHIRQueryProcessor') as MockProcessor, \
-                patch('app.main.datetime') as mock_datetime, \
+        with patch('app.database.db_engine.get_session', return_value=mock_db), \
+                patch('app.nlp.fhir_nlp_service.FHIRQueryProcessor') as MockProcessor, \
+                patch(datetime) as mock_datetime, \
                 patch('app.main.current_user') as mock_current_user:
             mock_processor_instance = AsyncMock()
             MockProcessor.return_value = mock_processor_instance
@@ -310,7 +311,7 @@ class TestRoutes:
 
             mock_datetime.now.side_effect = [mock_start, mock_end]
 
-            response = client.post("/query", json=sample_query_data)
+            response = async_client.post("/query", json=sample_query_data)
 
             assert response.status_code == 200
             response_data = response.json()
@@ -318,7 +319,7 @@ class TestRoutes:
 
     # Test Edge Cases
     @pytest.mark.asyncio
-    async def test_process_query_special_characters(self, client, mock_db):
+    async def test_process_query_special_characters(self, async_client, mock_db):
         """Test query processing with special characters in query"""
         special_queries = [
             {"query": "patients with diabetes & hypertension"},
@@ -327,9 +328,9 @@ class TestRoutes:
             {"query": "patients with unicode: ñáéíóú"},
         ]
 
-        with patch('app.main.get_db', return_value=mock_db), \
-                patch('app.main.FHIRQueryProcessor') as MockProcessor, \
-                patch('app.main.datetime') as mock_datetime, \
+        with patch('app.database.db_engine.get_session', return_value=mock_db), \
+                patch('app.nlp.fhir_nlp_service.FHIRQueryProcessor') as MockProcessor, \
+                patch(datetime) as mock_datetime, \
                 patch('app.main.current_user') as mock_current_user:
             mock_processor_instance = AsyncMock()
             MockProcessor.return_value = mock_processor_instance
@@ -345,16 +346,16 @@ class TestRoutes:
             mock_now.__sub__ = Mock(return_value=Mock(total_seconds=Mock(return_value=1.0)))
 
             for query_data in special_queries:
-                response = client.post("/query", json=query_data)
+                response = async_client.post("/query", json=query_data)
                 assert response.status_code == 200
                 assert response.json()["original_query"] == query_data["query"]
 
     @pytest.mark.asyncio
-    async def test_process_query_large_response(self, client, mock_db, sample_query_data):
+    async def test_process_query_large_response(self, async_client, mock_db, sample_query_data):
         """Test processing of large FHIR responses"""
-        with patch('app.main.get_db', return_value=mock_db), \
-                patch('app.main.FHIRQueryProcessor') as MockProcessor, \
-                patch('app.main.datetime') as mock_datetime, \
+        with patch('app.database.db_engine.get_session', return_value=mock_db), \
+                patch('app.nlp.fhir_nlp_service.FHIRQueryProcessor') as MockProcessor, \
+                patch(datetime) as mock_datetime, \
                 patch('app.main.current_user') as mock_current_user:
             mock_processor_instance = AsyncMock()
             MockProcessor.return_value = mock_processor_instance
@@ -384,7 +385,7 @@ class TestRoutes:
             mock_datetime.now.return_value = mock_now
             mock_now.__sub__ = Mock(return_value=Mock(total_seconds=Mock(return_value=1.0)))
 
-            response = client.post("/query", json=sample_query_data)
+            response = async_client.post("/query", json=sample_query_data)
 
             assert response.status_code == 200
             response_data = response.json()
@@ -405,9 +406,9 @@ def no_sleep():
 class TestFastRoutes:
     """Fast-running route tests"""
 
-    def test_suggestions_fast(self, client):
+    def test_suggestions_fast(self, async_client):
         """Quick test for suggestions"""
-        response = client.get("/suggestions")
+        response = async_client.get("/suggestions")
         assert response.status_code == 200
 
 
@@ -416,8 +417,37 @@ class TestIntegrationRoutes:
     """Integration tests for routes"""
 
     @pytest.mark.asyncio
-    async def test_full_integration(self, client):
+    async def test_full_integration(self, async_client):
         """Test full integration workflow"""
         # This would be for tests that hit real endpoints
         # Use sparingly and mark as integration
         pass
+
+@pytest.mark.asyncio
+async def test_register_user_success(async_client):
+    payload = {
+        "email": "john@example.com",
+        "username": "john",
+        "password": "secret123",
+    }
+    response = await async_client.post("/auth/register", json=payload)
+    assert response.status_code == 201
+    data = response.json()
+    assert data["email"] == payload["email"]
+    assert data["username"] == payload["username"]
+    assert "hashed_password" not in data
+    assert "id" in data
+
+@pytest.mark.asyncio
+async def test_register_duplicate_email(async_client):
+    payload = {
+        "email": "dup@example.com",
+        "username": "dupuser",
+        "password": "secret123",
+    }
+    res1 = await async_client.post("/auth/register", json=payload)
+    assert res1.status_code == 201
+
+    res2 = await async_client.post("/auth/register", json=payload)
+    assert res2.status_code == 400
+    assert "Email already registered" in res2.text

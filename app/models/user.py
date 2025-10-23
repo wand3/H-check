@@ -23,7 +23,7 @@ class UserModel(SQLModel, table=True):
     hashed_password: str
     username: Optional[str] = Field(default=None)
     disabled: bool = Field(default=False)
-    profile_pic: str
+    profile_pic: str = Field(default=None, nullable=True)
 
     # Use default_factory for values generated at creation time
     created_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)

@@ -11,7 +11,7 @@ class Config:
     # Database
     DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql+asyncpg://postgres:ma3str0@localhost:5432/hcheck")
     SYNC_DATABASE_URL: str = os.getenv("SYNC_DATABASE_URL", "postgresql://postgres:ma3str0@localhost:5432/hcheck")
-
+    ACCESS_TOKEN_EXPIRE_MINUTES = 10
     # FHIR Server
     FHIR_BASE_URL: str = os.getenv("FHIR_BASE_URL", "https://hapi.fhir.org/baseR5")
 

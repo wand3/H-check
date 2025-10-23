@@ -14,14 +14,30 @@ from ..config import Config
 from jose import jwt, JWTError
 from app.database.db_engine import get_session
 from ..security import hash_password
+from uuid import UUID
 
-async def create_user(db: AsyncSession, user_data: UserCreate) -> UserModel:
-    # The validation logic for existing users should ideally be in the API route
-    # to provide immediate feedback, but can also be here.
 
+# async def create_user(db: AsyncSession, user_data: UserCreate) -> UserModel:
+#     # The validation logic for existing users should ideally be in the API route
+#     # to provide immediate feedback, but can also be here.
+#
+#     hashed_pass = hash_password(user_data.password)
+#     user = UserModel.from_orm(user_data, {"hashed_password": hashed_pass})
+#
+#     db.add(user)
+#     await db.commit()
+#     await db.refresh(user)
+#     return user
+
+async def create_user(db: AsyncSession, user_data: UserCreate) -> UserInDB:
     hashed_pass = hash_password(user_data.password)
-    user = UserModel.from_orm(user_data, {"hashed_password": hashed_pass})
-
+    user = UserModel(
+        email=user_data.email,
+        username=user_data.username,
+        hashed_password=hashed_pass,
+        disabled=user_data.disabled or False,
+        profile_pic=user_data.profile_pic,
+    )
     db.add(user)
     await db.commit()
     await db.refresh(user)
@@ -43,23 +59,58 @@ async def get_user_by_id(db: AsyncSession, user_id: uuid.UUID) -> Optional[UserM
     return await db.get(UserModel, user_id)  # .get() is simpler for primary keys
 
 
-async def update_user(db: AsyncSession, user: UserModel, user_data: UserUpdate) -> UserModel:
-    update_dict = user_data.dict(exclude_unset=True)
+async def update_user_in_db(
+    db: AsyncSession,
+    user_id: UUID,
+    user_update: UserUpdate
+) -> Optional[UserModel]:
+    """
+    Update a UserModel row with fields provided in user_update.
+    Returns the updated SQLModel instance or None if not found.
+    """
+    stmt = select(UserModel).where(UserModel.id == user_id)
+    result = await db.execute(stmt)
+    user: Optional[UserModel] = result.scalar_one_or_none()
 
-    if "password" in update_dict:
-        update_dict["hashed_password"] = hash_password(update_dict.pop("password"))
+    if user is None:
+        return None
 
-    for field, value in update_dict.items():
+    # Build dict of provided fields only
+    update_data = user_update.dict(exclude_unset=True)
+
+    # If password is included, hash it before storing
+    if "password" in update_data:
+        plain = update_data.pop("password")
+        update_data["hashed_password"] = hash_password(plain)
+
+    # Apply updates
+    for field, value in update_data.items():
+        # defensive: skip None on fields you want to keep unchanged unless explicit
         setattr(user, field, value)
-
-    # Note: onupdate handles this automatically now, but if you want to force it:
-    # user.updated_at = datetime.utcnow()
 
     db.add(user)
     await db.commit()
     await db.refresh(user)
     return user
 
+
+async def update_user_image_in_db(db: AsyncSession, user_id: UUID, image_filename: str) -> Optional[UserModel]:
+    """
+    Update the user's profile_pic and updated_at, commit and return the refreshed instance.
+    """
+    stmt = select(UserModel).where(UserModel.id == user_id)
+    result = await db.execute(stmt)
+    user = result.scalar_one_or_none()
+    if user is None:
+        return None
+
+    user.profile_pic = image_filename
+    user.updated_at = datetime.utcnow()
+
+    db.add(user)
+    await db.commit()
+    await db.refresh(user)
+    return user
 
 async def delete_user(db: AsyncSession, user_id: uuid.UUID) -> bool:
     user = await db.get(UserModel, user_id)

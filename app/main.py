@@ -10,7 +10,7 @@ from pathlib import Path
 
 
 def create_app() -> FastAPI:
-    app: FastAPI = FastAPI(db_lifespan=get_session())
+    app: FastAPI = FastAPI(db_lifespan=get_session)
     logger.info(f'Application started -----------')
 
 

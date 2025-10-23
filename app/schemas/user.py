@@ -2,7 +2,7 @@ from datetime import datetime
 from bson import ObjectId # type: ignore
 from pydantic import BaseModel, EmailStr, constr, Field, field_validator # type: ignore
 from typing import Optional
-from ..schemas import PyObjectId
+# from ..schemas import PyObjectId
 
 
 class UserBase(BaseModel):
@@ -16,15 +16,8 @@ class UserBase(BaseModel):
 
 
 class UserInDB(UserBase):
-    # id: Optional[PyObjectId] = Field(alias="_id", default=None)  # Alias _id to id
-    # hashed_password: str
     created_at: datetime
     updated_at: datetime
-
-    # @field_validator("id")
-    # def convert_objectid_to_str(cls, v):
-    #     if isinstance(v, ObjectId):
-    #         return str(v)
 
     class Config:
         from_attributes = True  # <-- allows .from_orm() and response_model conversion

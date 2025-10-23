@@ -25,7 +25,7 @@ async def create_db_and_tables():
     Initializes the database tables. Should be called once on application startup.
     """
     async with engine.begin() as conn:
-        await conn.run_sync(SQLModel.metadata.drop_all) # Optional: drop tables first
+        # await conn.run_sync(SQLModel.metadata.drop_all) # Optional: drop tables first
         await conn.run_sync(SQLModel.metadata.create_all)
 
 async def get_session() -> AsyncSession:
