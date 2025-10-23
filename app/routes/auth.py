@@ -76,9 +76,10 @@ async def register_user(
 @auth.post("/auth/login", response_model=Token)
 async def login_for_access_token(
         form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+        db: Annotated[AsyncSession, Depends(get_session)],
         user_model: Annotated[UserModel, Depends(get_user_model)],
 ) -> Token:
-    user = await user_model.authenticate_user(self=user_model, username=form_data.username, password=form_data.password)
+    user = await authenticate_user(db, username=form_data.username, password=form_data.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -86,39 +87,50 @@ async def login_for_access_token(
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token_expires = timedelta(minutes=Config.ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = user_model.create_access_token(
+    access_token = create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
     return Token(access_token=access_token, token_type="bearer")
 
 
 # check if username already exists in database
-@auth.get("/auth/check-username", status_code=status.HTTP_200_OK)
+@auth.get("/check-username", status_code=status.HTTP_200_OK)
 async def check_username(
-        user_model: Annotated[UserModel, Depends(get_user_model)],
-        username: str = Query(None)
+    username: str = Query(..., description="Username to check"),
+    db: AsyncSession = Depends(get_session),
 ):
     """
-    Checks if a username already exists in the database.
+    Checks if a username already exists in the PostgreSQL database.
     """
     if not username:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Username is required")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Username is required"
+        )
 
-    existing_user = await user_model.db.find_one({"username": username})
+    stmt = select(UserModel).where(UserModel.username == username)
+    result = await db.execute(stmt)
+    existing_user = result.scalar_one_or_none()
+
     return {"exists": existing_user is not None}
 
 
-# check if email already exists in database
-@auth.get("/auth/check-email", status_code=status.HTTP_200_OK)
+@auth.get("/check-email", status_code=status.HTTP_200_OK)
 async def check_email(
-        user_model: Annotated[UserModel, Depends(get_user_model)],
-        email: str = Query(None)
+    email: str = Query(..., description="Email to check"),
+    db: AsyncSession = Depends(get_session),
 ):
     """
-    Checks if an email already exists in the database.
+    Checks if an email already exists in the PostgreSQL database.
     """
     if not email:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email is required")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email is required"
+        )
 
-    existing_user = await user_model.db.find_one({"email": email})
+    stmt = select(UserModel).where(UserModel.email == email)
+    result = await db.execute(stmt)
+    existing_user = result.scalar_one_or_none()
+
     return {"exists": existing_user is not None}
