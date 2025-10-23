@@ -1,7 +1,9 @@
 import Config from '../config';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { RootState } from '../store'; // Import your RootState type
-import { UserInDBSchema } from '../schemas/user';
+import type { RootState } from '../store'; // Import your RootState type
+ // Import your RootState type
+// Import your RootState type
+import type { UserInDBSchema } from '../schemas/user';
 
 export const authApi = createApi({
   reducerPath: 'authApi',

@@ -1,5 +1,7 @@
-import { UserSchema } from '../schemas/user';
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import type { UserSchema } from '../schemas/user';
+import { createSlice } from '@reduxjs/toolkit'
+import type { PayloadAction } from '@reduxjs/toolkit';
+
 import { registerUser, loginUser } from '../services/auth';
 
 

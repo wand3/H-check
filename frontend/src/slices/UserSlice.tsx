@@ -1,5 +1,7 @@
-import { UserInDBSchema } from '../schemas/user';
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import type { UserInDBSchema } from '../schemas/user';
+import { createSlice } from '@reduxjs/toolkit'
+import type { PayloadAction } from '@reduxjs/toolkit';
+
 
 // initialize userToken from local storage
 const storedToken = localStorage.getItem('token');

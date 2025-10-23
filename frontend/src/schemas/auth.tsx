@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { UserSchema } from "./user";
+import type { UserSchema } from "./user";
 
 
 // register 
