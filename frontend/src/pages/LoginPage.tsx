@@ -69,7 +69,7 @@ const LoginPage = () => {
   return (
     <>
       <HBody nav={false}>
-        <section className="bg-white/70 rounded-md drop-shadow-2xl relative z-10 mt-[-4.75rem] justify-around m-auto flex mt-[10%]">
+        <section className="bg-slate-800/50 rounded-md drop-shadow-2xl relative z-10 mt-[-4.75rem] justify-around m-auto flex mt-[10%]">
           <div className="lg:grid lg:min-h-screen lg:grid-cols-12">
             <section className="relative flex h-32 items-end lg:col-span-5 lg:h-full xl:col-span-6">
               <img

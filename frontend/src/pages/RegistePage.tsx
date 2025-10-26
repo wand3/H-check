@@ -93,24 +93,24 @@ const RegisterPage = () => {
   return (
     <>
       <HBody nav={false}>
-        <section className="bg-white/70 rounded-md drop-shadow-2xl justify-around m-auto flex mt-[10%]">
+        <section className="bg-slate-800/50 rounded-md drop-shadow-2xl justify-around m-auto flex my-[10%]">
           <div className="lg:grid lg:min-h-screen lg:grid-cols-12">
-            <aside className="relative block h-16 lg:order-last lg:col-span-5 lg:h-full xl:col-span-6">
-              <img src="/pexels-gabby-k-9430875.jpg" className="absolute inset-0 h-full w-full object-cover"/>
-            </aside>
+            {/* <aside className="relative block h-16 lg:order-last lg:col-span-5 lg:h-full xl:col-span-6">
+              <img src="/fhir-bg.jpeg" className="absolute inset-0 h-full w-full object-cover"/>
+            </aside> */}
 
             <main
-              className="flex items-center justify-center px-8 py-8 sm:px-12 lg:col-span-7 lg:px-16 lg:py-12 xl:col-span-6"
+              className="flex items-center text-white justify-center px-8 py-8 sm:px-12 lg:col-span-7 lg:px-16 lg:py-12 xl:col-span-6"
             >
-              <div className="max-w-xl lg:max-w-3xl">
+              <div className="max-w-xl shadow-lg drop-shadow-2xl lg:max-w-3xl">
 
-                <div className="max-w-xl lg:max-w-3xl shadow-lg pb-5 px-3 rounded-md">
+                <div className="max-w-xl lg:max-w-3xl shadow-lg p-5 px-3 rounded-md">
                   <a className="block text-[#ba2a25]" href="/">
                     <span className="sr-only">Home</span>
                     {/* <StoreIcon className="h-[4rem] w-fit"/> */}
                   </a>
 
-                  <h1 className="mt-6 text-2xl font-bold text-gray-900 sm:text-3xl md:text-4xl">
+                  <h1 className="mt-6 text-2xl font-bold sm:text-3xl md:text-4xl">
                     Welcome to H-Check<span className="inline-flex absolute mt-1 ml-1">
                     {/* <ShoppingBag /> */}
                     </span>
@@ -120,26 +120,26 @@ const RegisterPage = () => {
                     {/* {error && <p className="text-xs text-red-600 block">{error}</p>} */}
 
                     <div className="col-span-6 sm:col-span-3">
-                      <label  htmlFor="Email" className="flex text-sm font-medium text-gray-700" >Email</label>
-                      <input className="mt-1 w-full p-1 rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm" {...register("email")} />
+                      <label  htmlFor="Email" className="flex text-sm font-medium" >Email</label>
+                      <input className="mt-1 w-full p-1 rounded-md border-gray-200 bg-white text-sm text-white shadow-sm" {...register("email")} />
                       {errors.email && <p className="flex mt-2 text-xs text-red-600">{errors.email.message}</p>}
                     </div>
                     
                     <div className="col-span-6 sm:col-span-3">
-                      <label  htmlFor="Username" className="flex text-sm font-medium text-gray-700" >Username</label>
-                      <input className="mt-1 w-full p-1 rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm" {...register("username")} />
+                      <label  htmlFor="Username" className="flex text-sm font-medium" >Username</label>
+                      <input className="mt-1 w-full p-1 rounded-md border-gray-200 bg-white text-sm text-white shadow-sm" {...register("username")} />
                       {errors.username && <p className="flex mt-2 text-xs text-red-600">{errors.username.message}</p>}
                     </div>  
 
                     <div className="col-span-6 sm:col-span-3">
-                      <label  htmlFor="Password" className="flex text-sm font-medium text-gray-700" >Password</label>
-                      <input className="mt-1 w-full p-1 rounded-lg border-gray-200 bg-white text-sm text-gray-700 shadow-sm" type="password" {...register("password")} />
+                      <label  htmlFor="Password" className="flex text-sm font-medium text-white" >Password</label>
+                      <input className="mt-1 w-full p-1 rounded-lg border-gray-200 bg-white text-sm text-white shadow-sm" type="password" {...register("password")} />
                       {errors.password && <p className="flex mt-2 text-xs text-red-600">{errors.password.message}</p>}
                     </div>  
                     
                     <div className="col-span-6 sm:col-span-3">
-                      <label  htmlFor="Confirm Password" className="flex text-sm font-medium text-gray-700" >Confirm Password</label>
-                      <input className="mt-1 w-full p-1 rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm" type="password" {...register("confirm")} />
+                      <label  htmlFor="Confirm Password" className="flex text-sm font-medium text-white" >Confirm Password</label>
+                      <input className="mt-1 w-full p-1 rounded-md border-gray-200 bg-white text-sm text-white shadow-sm" type="password" {...register("confirm")} />
                       {errors.confirm && <p className="flex mt-2 text-xs text-red-600">{errors.confirm.message}</p>}
                     </div>   
 
@@ -151,16 +151,16 @@ const RegisterPage = () => {
                           name="marketing_accept"
                           className="size-5 rounded-md border-gray-200 bg-white shadow-sm"
                         />
-                        <span className="text-sm text-gray-700">
+                        <span className="text-sm text-white">
                           I want to receive emails about events, product updates and company announcements.
                         </span>
                       </label>
                     </div>
 
                     <div className="col-span-6 py-2">
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-slate-100">
                         By creating an account, you agree to our
-                        <a href="#" className="text-gray-700 underline"> terms and conditions </a>
+                        <a href="#" className="text-white underline"> terms and conditions </a>
                       </p>
                     </div>
 
@@ -172,9 +172,9 @@ const RegisterPage = () => {
                         {loading ? <SpinnerLineWave /> : 'Create Account'}
                       </button>
 
-                      <p className="mt-4 text-sm text-gray-500 sm:mt-0">
+                      <p className="mt-4 text-sm text-slate-100 sm:mt-0">
                         Already have an account?
-                        <a href="/login" className="text-gray-700 underline">Log in</a>.
+                        <a href="/login" className="text-white underline">Log in</a>.
                       </p>
                     </div>
                       
