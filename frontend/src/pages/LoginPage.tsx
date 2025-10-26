@@ -68,8 +68,8 @@ const LoginPage = () => {
   
   return (
     <>
-      <HBody nav={true}>
-        <section className="relative z-10 mt-[-4.75rem]">
+      <HBody nav={false}>
+        <section className="bg-white/70 rounded-md drop-shadow-2xl relative z-10 mt-[-4.75rem] justify-around m-auto flex mt-[10%]">
           <div className="lg:grid lg:min-h-screen lg:grid-cols-12">
             <section className="relative flex h-32 items-end lg:col-span-5 lg:h-full xl:col-span-6">
               <img
@@ -109,8 +109,7 @@ const LoginPage = () => {
                   </h1>
 
                   <p className="mt-4 leading-relaxed text-gray-500">
-                    Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eligendi nam dolorum aliquam,
-                    quibusdam aperiam voluptatum.
+                    H-Check, your AI-powered healthcare data querying tool that interfaces with FHIR-compliant systems
                   </p>
                 </div>
 
@@ -119,13 +118,13 @@ const LoginPage = () => {
                     
                     <div className="col-span-6 sm:col-span-3">
                       <label  htmlFor="Username" className="flex text-sm font-medium text-gray-700" >Username</label>
-                      <input className="mt-1 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm" {...register("username")} />
+                      <input className="mt-1 p-1 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm" {...register("username")} />
                       {errors.username && <p className="flex mt-2 text-xs text-red-600">{errors.username.message}</p>}
                     </div>  
 
                     <div className="col-span-6 sm:col-span-3">
                       <label  htmlFor="Password" className="flex text-sm font-medium text-gray-700" >Password</label>
-                      <input className="mt-1 w-full rounded-lg border-gray-200 bg-white text-sm text-gray-700 shadow-sm" type="password" {...register("password")} />
+                      <input className="mt-1 p-1 w-full rounded-lg border-gray-200 bg-white text-sm text-gray-700 shadow-sm" type="password" {...register("password")} />
                       {errors.password && <p className="flex mt-2 text-xs text-red-600">{errors.password.message}</p>}
                     </div>  
 

@@ -7,10 +7,7 @@ from app.database.db_engine import get_session
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.nlp.fhir_nlp_service import FHIRQueryProcessor
 
-
-
 main = APIRouter()
-
 
 @main.get("/fhir")
 async def root():
@@ -21,10 +18,9 @@ async def root():
     
 """
 
-
 @main.post("/query")
 async def process_query(
-        query_data: str,
+        query_data: dict,
         db: AsyncSession = Depends(get_session),
 ):
     from datetime import datetime
