@@ -1,4 +1,9 @@
 // ---------------------------
+// Post Response
+// ---------------------------
+export interface QuerySchema {
+  query: string;
+}
 // Root Response
 // ---------------------------
 export interface FhirQueryResponse {

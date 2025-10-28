@@ -1,6 +1,8 @@
 # H-check
 An AI-powered healthcare data querying tool that interfaces with FHIR-compliant system
 
+<a href="https://youtu.be/shCTg0cGyqc" target="_blank"> :clapper:  Watch</a>
+
 ## <a name="tech-stack">⚙️ Tech Stack</a>
 - Python
 - Fastapi

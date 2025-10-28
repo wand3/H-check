@@ -424,7 +424,7 @@ class TestIntegrationRoutes:
         pass
 
 @pytest.mark.asyncio
-async def test_register_user_success(async_client):
+async def test_register_user_success(self, async_client):
     payload = {
         "email": "john@example.com",
         "username": "john",
@@ -439,7 +439,7 @@ async def test_register_user_success(async_client):
     assert "id" in data
 
 @pytest.mark.asyncio
-async def test_register_duplicate_email(async_client):
+async def test_register_duplicate_email(self, async_client):
     payload = {
         "email": "dup@example.com",
         "username": "dupuser",

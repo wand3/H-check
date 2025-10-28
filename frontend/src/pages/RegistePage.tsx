@@ -93,8 +93,8 @@ const RegisterPage = () => {
   return (
     <>
       <HBody nav={false}>
-        <section className="bg-slate-800/50 rounded-md drop-shadow-2xl justify-around m-auto flex my-[10%]">
-          <div className="lg:grid lg:min-h-screen lg:grid-cols-12">
+        <section className="bg-slate-800/50 rounded-md drop-shadow-2xl justify-around my-[5vh] flex">
+          <div className="lg:grid h-[80%] lg:grid-cols-12">
             {/* <aside className="relative block h-16 lg:order-last lg:col-span-5 lg:h-full xl:col-span-6">
               <img src="/fhir-bg.jpeg" className="absolute inset-0 h-full w-full object-cover"/>
             </aside> */}
@@ -121,25 +121,25 @@ const RegisterPage = () => {
 
                     <div className="col-span-6 sm:col-span-3">
                       <label  htmlFor="Email" className="flex text-sm font-medium" >Email</label>
-                      <input className="mt-1 w-full p-1 rounded-md border-gray-200 bg-white text-sm text-white shadow-sm" {...register("email")} />
+                      <input className="mt-1 w-full p-1 rounded-md border-gray-200 bg-white text-sm text-gray-600 shadow-sm" {...register("email")} />
                       {errors.email && <p className="flex mt-2 text-xs text-red-600">{errors.email.message}</p>}
                     </div>
                     
                     <div className="col-span-6 sm:col-span-3">
                       <label  htmlFor="Username" className="flex text-sm font-medium" >Username</label>
-                      <input className="mt-1 w-full p-1 rounded-md border-gray-200 bg-white text-sm text-white shadow-sm" {...register("username")} />
+                      <input className="mt-1 w-full p-1 rounded-md border-gray-200 bg-white text-sm text-gray-600 shadow-sm" {...register("username")} />
                       {errors.username && <p className="flex mt-2 text-xs text-red-600">{errors.username.message}</p>}
                     </div>  
 
                     <div className="col-span-6 sm:col-span-3">
                       <label  htmlFor="Password" className="flex text-sm font-medium text-white" >Password</label>
-                      <input className="mt-1 w-full p-1 rounded-lg border-gray-200 bg-white text-sm text-white shadow-sm" type="password" {...register("password")} />
+                      <input className="mt-1 w-full p-1 rounded-lg border-gray-200 bg-white text-sm text-gray-600 shadow-sm" type="password" {...register("password")} />
                       {errors.password && <p className="flex mt-2 text-xs text-red-600">{errors.password.message}</p>}
                     </div>  
                     
                     <div className="col-span-6 sm:col-span-3">
                       <label  htmlFor="Confirm Password" className="flex text-sm font-medium text-white" >Confirm Password</label>
-                      <input className="mt-1 w-full p-1 rounded-md border-gray-200 bg-white text-sm text-white shadow-sm" type="password" {...register("confirm")} />
+                      <input className="mt-1 w-full p-1 rounded-md border-gray-200 bg-white text-sm text-gray-600 shadow-sm" type="password" {...register("confirm")} />
                       {errors.confirm && <p className="flex mt-2 text-xs text-red-600">{errors.confirm.message}</p>}
                     </div>   
 

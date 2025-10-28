@@ -69,14 +69,10 @@ const LoginPage = () => {
   return (
     <>
       <HBody nav={false}>
-        <section className="bg-slate-800/50 rounded-md drop-shadow-2xl relative z-10 mt-[-4.75rem] justify-around m-auto flex mt-[10%]">
-          <div className="lg:grid lg:min-h-screen lg:grid-cols-12">
-            <section className="relative flex h-32 items-end lg:col-span-5 lg:h-full xl:col-span-6">
-              <img
-                alt="login-banner"
-                src="/pexels-gabby-k-9430875.jpg"
-                className="absolute inset-0 h-full w-full object-cover opacity-80"
-              />
+        <section className="bg-slate-800/50 w-[70vw] rounded-md drop-shadow-2xl justify-around mx-auto my-[15%] flex">
+          <div className="lg:grid h-[80%] lg:grid-cols-12">
+            <section className="relative flex items-end lg:col-span-5 lg:h-full xl:col-span-6">
+        
               <div className="hidden lg:relative lg:block lg:p-12">
 
                 <a className="block text-[#ba2a25] p-2" href="/">
@@ -96,19 +92,19 @@ const LoginPage = () => {
               <div className="max-w-xl lg:max-w-3xl shadow-lg pb-5 px-3 rounded-md">
                 <div className="relative -mt-16 block lg:hidden">
                   <a
-                    className="inline-flex size-16 text-[#ba2a25] p-2 items-center justify-center rounded-full bg-white sm:size-20"
+                    className="inline-flex size-16 text-[#ba2a25] p-2 items-center justify-center sm:size-20"
                     href="/"
                   >
-                    <span className="sr-only">Home</span>
+                    {/* <span className="sr-only">Home</span> */}
                     {/* <StoreIcon className="h-[4rem] w-fit"/> */}
 
                   </a>
 
-                  <h1 className="mt-2 text-2xl font-bold text-gray-900 sm:text-3xl md:text-4xl">
+                  <h1 className="mt-2 text-2xl font-bold text-white sm:text-3xl md:text-4xl">
                     {/* Welcome to KASUWA<span className="inline-flex absolute mt-1 ml-1"><ShoppingBag /></span> */}
                   </h1>
 
-                  <p className="mt-4 leading-relaxed text-gray-500">
+                  <p className="mt-4 leading-relaxed text-white">
                     H-Check, your AI-powered healthcare data querying tool that interfaces with FHIR-compliant systems
                   </p>
                 </div>
@@ -117,14 +113,14 @@ const LoginPage = () => {
                     {error && <p className="text-xs text-red-600 block">{error}</p>}
                     
                     <div className="col-span-6 sm:col-span-3">
-                      <label  htmlFor="Username" className="flex text-sm font-medium text-gray-700" >Username</label>
-                      <input className="mt-1 p-1 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm" {...register("username")} />
+                      <label  htmlFor="Username" className="flex text-sm font-medium text-white" >Username</label>
+                      <input className="mt-1 p-1 w-full rounded-md border-gray-200 bg-white text-sm text-white shadow-sm" {...register("username")} />
                       {errors.username && <p className="flex mt-2 text-xs text-red-600">{errors.username.message}</p>}
                     </div>  
 
                     <div className="col-span-6 sm:col-span-3">
-                      <label  htmlFor="Password" className="flex text-sm font-medium text-gray-700" >Password</label>
-                      <input className="mt-1 p-1 w-full rounded-lg border-gray-200 bg-white text-sm text-gray-700 shadow-sm" type="password" {...register("password")} />
+                      <label  htmlFor="Password" className="flex text-sm font-medium text-white" >Password</label>
+                      <input className="mt-1 p-1 w-full rounded-lg border-gray-200 bg-white text-sm text-gray-600 shadow-sm" type="password" {...register("password")} />
                       {errors.password && <p className="flex mt-2 text-xs text-red-600">{errors.password.message}</p>}
                     </div>  
 
@@ -137,7 +133,7 @@ const LoginPage = () => {
                         className="size-4 rounded-md border-gray-200 bg-white shadow-sm"
                       />
 
-                      <span className="text-sm text-gray-700">
+                      <span className="text-sm text-white">
                         Keep account Signed in
                       </span>
                     </label>
@@ -153,9 +149,9 @@ const LoginPage = () => {
                         {loading ? <SpinnerLineWave /> : 'Login'}
                       </button>
 
-                    <p className="mt-4 text-sm text-gray-500 sm:mt-0">
+                    <p className="mt-4 text-sm text-white sm:mt-0">
                       Don't have an account?
-                      <a href="/register" className="text-gray-700 underline"> Sign up!</a>.
+                      <a href="/register" className="text-white underline"> Sign up!</a>.
                     </p>
                   </div>
                 </form>

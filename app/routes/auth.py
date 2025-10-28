@@ -12,6 +12,7 @@ from app.services.user_services import get_user_by_username, get_user_by_id, get
 from app.security import authenticate_user, create_access_token
 from app.logger import logger
 from ..config import Config
+from sqlalchemy import select
 
 auth = APIRouter(tags=["Auth"])
 
@@ -94,7 +95,7 @@ async def login_for_access_token(
 
 
 # check if username already exists in database
-@auth.get("/check-username", status_code=status.HTTP_200_OK)
+@auth.get("/auth/check-username", status_code=status.HTTP_200_OK)
 async def check_username(
     username: str = Query(..., description="Username to check"),
     db: AsyncSession = Depends(get_session),
@@ -115,7 +116,7 @@ async def check_username(
     return {"exists": existing_user is not None}
 
 
-@auth.get("/check-email", status_code=status.HTTP_200_OK)
+@auth.get("/auth/check-email", status_code=status.HTTP_200_OK)
 async def check_email(
     email: str = Query(..., description="Email to check"),
     db: AsyncSession = Depends(get_session),

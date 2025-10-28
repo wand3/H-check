@@ -47,6 +47,27 @@ async def read_user_me(
         # Handle HTTPException and re-raise it
         raise e
 
+@router.get("/", response_model=None)
+async def read_user(
+    current_user: UserBase = Depends(get_current_active_user),
+):
+    try:
+        # Ensure the current_user is valid and active
+        if not current_user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
+        if getattr(current_user, "disabled", False):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Inactive user"
+            )
+        return current_user
+    except HTTPException as e:
+        # Handle HTTPException and re-raise it
+        raise e
+
 
 @router.put("/{user_id}/me", response_model=UserBase)
 async def update_user_endpoint(
