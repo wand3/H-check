@@ -3,7 +3,6 @@ import React, { FC } from "react";
 import FlashMessage from "./FlashMessage";
 
 
-
 type BodyProps = {
   nav: boolean;
   children?: React.ReactNode;

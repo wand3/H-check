@@ -1,5 +1,5 @@
 import HBody from "../components/Body";
-import Example from "../components/ChatBot";
+import FhirBot from "../components/ChatBot";
 
 const Home = () => {
 
@@ -7,7 +7,7 @@ const Home = () => {
         <> 
             <HBody nav={false}>
               {/* <h1 className='text-lg text-center text-white'>Homepage success</h1> */}
-              <Example />
+              <FhirBot />
               {/* <div id="chat-container">
                     <div id="messages"></div>
                     <form id="message-form">
