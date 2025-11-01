@@ -50,7 +50,6 @@ const RegisterPage = () => {
       flash('Registeration successful', 'success')
 
     }
-    flash('Failed', 'error')
 
   }, [success, navigate]);
 
@@ -81,6 +80,8 @@ const RegisterPage = () => {
         }));
       } catch (err: any) {
         console.error("Registration error:", err);
+        flash('Failed', 'error')
+
         if (axios.isAxiosError(err)) {
           setError("root", { type: "manual", message: err.response?.data?.message || err.message || 'Registration failed due to network error' });
         } else {
@@ -93,11 +94,11 @@ const RegisterPage = () => {
   return (
     <>
       <HBody nav={false}>
-        <section className="bg-slate-800/50 rounded-md drop-shadow-2xl justify-around my-[5vh] flex">
+        <section className="bg-muted/30 rounded-md drop-shadow-2xl justify-around my-[5vh] flex">
           <div className="lg:grid h-[80%] lg:grid-cols-12">
-            {/* <aside className="relative block h-16 lg:order-last lg:col-span-5 lg:h-full xl:col-span-6">
-              <img src="/fhir-bg.jpeg" className="absolute inset-0 h-full w-full object-cover"/>
-            </aside> */}
+            <aside className="relative block h-16 lg:order-last lg:col-span-5 lg:h-full xl:col-span-6">
+              <img src="/fhir-bg.jpeg" className="absolute inset-0 h-full w-full object-cover rounded-e-md"/>
+            </aside>
 
             <main
               className="flex items-center text-white justify-center px-8 py-8 sm:px-12 lg:col-span-7 lg:px-16 lg:py-12 xl:col-span-6"
@@ -110,7 +111,7 @@ const RegisterPage = () => {
                     {/* <StoreIcon className="h-[4rem] w-fit"/> */}
                   </a>
 
-                  <h1 className="mt-6 text-2xl font-bold sm:text-3xl md:text-4xl">
+                  <h1 className="mt-6 text-green-600 text-2xl font-bold sm:text-3xl md:text-4xl">
                     Welcome to H-Check<span className="inline-flex absolute mt-1 ml-1">
                     {/* <ShoppingBag /> */}
                     </span>
@@ -166,7 +167,7 @@ const RegisterPage = () => {
 
                     <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
                       <button
-                        className="inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-10 py-3 text-sm font-medium text-white transition hover:bg-transparent hover:text-blue-600 focus:outline-none focus:ring active:text-blue-500"
+                        className="inline-block shrink-0 rounded-md border border-green-600 bg-green-600 px-10 py-3 text-sm font-medium text-white transition hover:bg-transparent hover:text-green-600 focus:outline-none focus:ring active:text-blue-500"
                         type="submit" aria-disabled={loading}
                       >
                         {loading ? <SpinnerLineWave /> : 'Create Account'}

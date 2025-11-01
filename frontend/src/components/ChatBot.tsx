@@ -20,13 +20,14 @@ import {
 import { Source, Sources, SourcesContent, SourcesTrigger } from '@/components/ui/shadcn-io/ai/source';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { RotateCcwIcon } from 'lucide-react';
+import { MenuIcon, RotateCcwIcon, User as UserIcon } from 'lucide-react'; // Renamed User to UserIcon
 import { nanoid } from 'nanoid';
 import { type FormEventHandler, useCallback, useEffect, useRef, useState } from 'react';
 
 // user provider 
 import React from "react";
 import UseApi from "../hooks/UseApi";
+import useFlash from "../hooks/UseFlash";
 import type { UserSchema } from "../context/UserProvider";
 import { useNavigate, useParams } from "react-router-dom";
 // import useUser from "../hooks/UseUser";
@@ -35,9 +36,12 @@ import type { FhirQueryResponse } from '@/schemas/fhirResponse';
 import Config from '@/config';
 import { FhirQueryVisualizer } from './Charts';
 import { useGetUserDetailsQuery } from '@/services/user';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import SpinnerLineWave from './Spinner';
-import type { RootState } from '@/store';
+import type { AppDispatch, RootState } from '@/store';
+import LoadingSpan from './LoadingSpan';
+import { logoutUser } from '../services/auth'
+import { logout } from '../slices/AuthSlice'
 
 
 const SUGGESTIONS: string[] = [
@@ -88,6 +92,7 @@ type ChatMessage = {
 
 
 const FhirBot = () => {
+
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: nanoid(),
@@ -101,29 +106,51 @@ const FhirBot = () => {
   ]);
   const {id} = useParams();
 
+
   // query input and suggestions 
   const [inputValue, setInputValue] = useState<string>('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
-  const navigate = useNavigate();
+  const flash = useFlash();
+  // const api = UseApi();
+
+  // toggle 
+  // State for mobile menu
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const toggleMobileMenu = () => setIsMobileMenuOpen(prev => !prev);
 
 
   // user 
   // Get the user state from Redux
-  const token = useSelector((state: RootState) => state.user.token);
-  // automatically authenticate user if token is found
-  const { data: user, isLoading: isUserLoading } = useGetUserDetailsQuery(token, {
+  // const token = useSelector((state: RootState) => state.user.token);
+
+  const token = useSelector((state: RootState) => state.auth.token);
+
+ 
+
+  // Fix the query hook
+  const { data: user, isLoading: isUserLoading, error: userError } = useGetUserDetailsQuery(undefined, {
     pollingInterval: 9000,
-    // Now skips if the token is null/undefined (e.g., user is logged out)
-    skip: !token, 
+    skip: !token,
   });
+  //  // Debug the token and user state
+  // useEffect(() => {
+  //   console.log('Token changed:', token);
+  // }, [token]);
+
+  // useEffect(() => {
+  //   console.log('User data changed:', user);
+  // }, [user]);
+
+
+  const dispatch = useDispatch<AppDispatch>(); // Type-safe dispatch 
+
  
   const [isTyping, setIsTyping] = useState(false);
   const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
   
   // result setting 
-  const [results, setResults] = useState<FhirQueryResponse | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // const [error, setError] = useState<string | null>(null);
 
   const simulateTyping = useCallback((messageId: string, content: string, reasoning?: string, sources?: Array<{ title: string; url: string }>) => {
     let currentIndex = 0;
@@ -161,6 +188,7 @@ const FhirBot = () => {
       event.preventDefault();
 
       if (!inputValue.trim() || isTyping) return;
+      setLoading(true);
 
       // Add user message
       const userMessage: ChatMessage = {
@@ -180,12 +208,16 @@ const FhirBot = () => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ query: inputValue.trim() }),
         });
-
         if (!resp.ok) throw new Error(`Server returned ${resp.status}`);
 
         // Parse FhirQueryResponse
         const data: FhirQueryResponse = await resp.json();
-        console.log(data)
+        // console.log(data)
+        if (data) {
+          setLoading(false);
+        }
+
+        // setStreamingMessageId(false);
 
         // Build assistant message based on the structured response
         const assistantMessageId = nanoid();
@@ -210,6 +242,7 @@ const FhirBot = () => {
         };
 
         setMessages((prev) => [...prev, errorMessage]);
+        setLoading(false)
       } finally {
         setIsTyping(false);
       }
@@ -251,94 +284,135 @@ const FhirBot = () => {
     debouncedFilter(value);
   };
 
+  const navigate = useNavigate();
+  const handleLogout = useCallback(async () => {
+    try { 
+
+
+      console.log('dispatch in');
+
+      // dispatch(logoutUser());
+      dispatch(logout());
+
+      navigate('/home'); // Replace '/home' with the actual path to your login page
+      // flash('Registeration successful', 'success')
+      console.log('success');
+      return
+
+    } catch (error) {
+      flash('Failed', 'error')
+      console.error('Logout failed:', error);
+    }
   
-  // function onSelectSuggestion(s: string) {
-  //   setQuery(s);
-  //   setShowSuggestions(false);
-  //   executeQuery(s);
-  // }
+  }, [navigate, dispatch]);
+  
 
-  const handleLogout = useCallback(() => {
-    // Clear stored tokens or session data
-    localStorage.removeItem('authToken');
-    sessionStorage.clear();
-
-    // Optionally show a message or toast
-    alert('You have been logged out.');
-
-    // Redirect to login page
-    navigate('/login');
-  }, [navigate]);
 
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden rounded-xl border bg-[url('/gradient-other.png')] bg-cover backdrop-blur-sm shadow-sm">
+    <div className="flex bg-muted/50 h-full w-full flex-col overflow-hidden rounded-xl border backdrop-blur-2xl shadow-sm">
       {/* Header */}
       <div className="flex items-center justify-between border-b bg-muted/50 px-4 py-3">
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <div className="size-2 rounded-full bg-green-500" />
+          {/* <div className="flex items-center gap-2"> */}
+            <div className="size-2 hidden sm:block rounded-full bg-green-500" />
             <span className="font-medium text-sm">FHIR Assistant</span>
              
-          </div>
+          {/* </div> */}
           <div className="h-4 w-px bg-border" />
           {/* { user && (
           <> */}
-          <span className='text-black'> Welcome {user?.username}</span>
+          <UserIcon className='size-4 text-green-600'/>
+          <span className='text-black text-xs sm:text-xl'> Hi {user?.username || 'Guest'}!</span>
           {/* </>
           )} */}
         </div>
 
-        
-        { user?.email && (
-          <>
-            <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
-              <a 
-                className="inline-block shrink-0 rounded-md border border-green-600 bg-green-600 px-10 py-3 text-sm font-medium text-white transition hover:bg-transparent hover:text-black focus:outline-none focus:ring active:text-green-500"
-                href="#logout"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleLogout();
-                }}
-              >
-              <button
-                className=""
-              
-              >
-              </button>
-              Logout!</a>
+        {/* Action Buttons Section */}
 
+        <div className="flex items-center gap-3">
+          { user?.email && (
+            <>
+                <a 
+                  href='/home' className="hidden sm:inline-block bg-black shrink-0 rounded-md backdrop-blur-md hover:bg-[#60645381] text-white p-3 text-sm font-medium transition hover:text-black focus:outline-none hover:backdrop-blur-sm focus:ring active:text-black"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </a>
+  
+            
+            </>
+          )}
+
+          { !user?.email && (
+            <>
+              {/* DESKTOP/TABLET AUTH BUTTONS (Hidden on mobile) */}
+              <div className="hidden md:flex items-center gap-3">
+              {/* <div className="col-span-6 sm:flex sm:items-center sm:gap-4"> */}
+                <a href="/login" className="bg-[#60645381] hover:bg-[#56574fc2] text-white px-4 py-2 text-sm font-medium rounded-md shadow transition">
+                <button
+                  className=""
+                  type="submit" aria-disabled={loading}
+                >
+                </button>
+                Sign in!</a>
+
+              <p className="mt-4 text-sm text-gray-500 sm:mt-0">
+                <a href="/register" className="text-gray-700 underline"> Sign up!</a>.
+              </p>
+              </div>
+            </>
+          )}
+
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={handleReset}
+            className="h-8 px-2 bg-gray-100 hover:bg-gray-200 rounded-md"
+          >
+            <RotateCcwIcon className="size-4 text-gray-600" />
+
+          </Button>
+
+          {/* MOBILE MENU TOGGLE (Hidden on desktop/tablet) */}
+          <button 
+            onClick={toggleMobileMenu}
+            className="md:hidden h-8 px-2 bg-gray-100 hover:bg-gray-200 rounded-md" 
+            title="Toggle Menu"
+          >
+            <MenuIcon className={`size-4 ${isMobileMenuOpen ? 'text-green-600' : 'text-gray-600'}`} />
+          </button>
+
+          {/* MOBILE DROPDOWN MENU (Only visible when open and on mobile) */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden absolute top-14 right-4 z-20 w-48 bg-white border border-gray-200 rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-1">
+            <div className="flex items-center justify-center p-3 border-b border-gray-100 bg-gray-50">
+                {/* Mock Logo / User Icon for "fancy dropdown with logo" */}
+                <UserIcon className="size-5 text-green-600 mr-2" />
+                <span className="font-semibold text-sm text-gray-800">Account</span>
+            </div>
+            
+            { user ? (
+              <button
+                onClick={handleLogout}
+                className="w-full text-center px-4 py-3 text-sm text-red-600 font-medium hover:bg-red-50 transition"
+              >
+                Logout
+              </button>
+            ) : (
+              <>
+                <a href="/login" className="block px-4 py-3 text-sm text-blue-600 font-medium hover:bg-gray-50 transition border-b">
+                  Sign In!
+                </a>
+                <a href="/register" className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition">
+                  Sign up!
+                </a>
+              </>
+            )}
           </div>
-          </>
         )}
 
-        { !user?.email && (
-          <>
-            <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
-              <a href="/login" className="inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-10 py-3 text-sm font-medium text-white transition hover:bg-transparent hover:text-blue-600 focus:outline-none focus:ring active:text-blue-500">
-              <button
-                className=""
-                type="submit" aria-disabled={loading}
-              >
-              </button>
-              Sign in!</a>
+        </div>
 
-            <p className="mt-4 text-sm text-gray-500 sm:mt-0">
-              Don't have an account?
-              <a href="/register" className="text-gray-700 underline"> Sign up!</a>.
-            </p>
-          </div>
-          </>
-        )}
-
-        <Button 
-          variant="ghost" 
-          size="sm"
-          onClick={handleReset}
-          className="h-8 px-2"
-        >
-          <RotateCcwIcon className="size-4" />
-          <span className="ml-1">Reset</span>
-        </Button>
       </div>
       {/* Conversation Area */}
       <Conversation className="flex-1">
@@ -357,29 +431,34 @@ const FhirBot = () => {
                     ''
                   )}
                 
-                  <div key={msg.id} className={msg.role === 'user' ? 'text-right' : 'text-left'}>
-                    {msg.fhirResponse ? (
-                      <FhirQueryVisualizer data={msg.fhirResponse} />
-                    ) : (
-                      <p className="p-2">{msg.content}</p>
-                    )}
-                  </div>
+                  {/* <div className="h-[350px]"> */}
+                    <div key={msg.id} className={msg.role === 'user' ? 'text-right' : 'text-left'}>
+                      {msg.fhirResponse ? (
+                        <FhirQueryVisualizer data={msg.fhirResponse} />
+                      ) : (
+                        <p className="p-2">{msg.content}</p>
+                      )}
+                    </div>
+                  {/* </div> */}
                 </MessageContent>
                 <MessageAvatar 
                     src={msg.role === 'user' ? 'https://github.com/dovazencot.png' : 'https://github.com/vercel.png'} 
                     name={msg.role === 'user' ? 'User' : 'AI'} 
                   />
                 
+                
               </Message>
+
               {/* Reasoning */}
-              {msg.reasoning && (
+              {/* {msg.reasoning && (
                 <div className="ml-10">
                   <Reasoning isStreaming={msg.isStreaming} defaultOpen={false}>
                     <ReasoningTrigger />
                     <ReasoningContent>{msg.reasoning}</ReasoningContent>
                   </Reasoning>
                 </div>
-              )}
+              )} */}
+              
               {/* Sources */}
               {msg.sources && msg.sources.length > 0 && (
                 <div className="ml-10">
@@ -415,7 +494,10 @@ const FhirBot = () => {
           ))}
         </div>
       )}
+      <div className="ml-10 py-3 text-sm font-medium text-white transition hover:bg-transparent hover:text-blue-600 focus:outline-none focus:ring active:text-blue-500" aria-disabled={loading}>
 
+        {loading && <LoadingSpan /> }
+      </div>
       {/* Input Area */}
       <div className="border-t p-4">
         <PromptInput onSubmit={handleSubmit}>

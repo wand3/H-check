@@ -53,8 +53,8 @@ const LoginPage = () => {
         const j = dispatch(loginUser({
           username: data.username, password: data.password,
         }));
-        console.log('post dispatch clear errors')
-        console.log(j)
+        // console.log('post dispatch clear errors')
+        // console.log(j)
 
       } catch (err: any) {
         console.error("Registration error:", err);
@@ -69,10 +69,10 @@ const LoginPage = () => {
   return (
     <>
       <HBody nav={false}>
-        <section className="bg-slate-800/50 w-[70vw] rounded-md drop-shadow-2xl justify-around mx-auto my-[15%] flex">
+        <section className="bg-muted/30 rounded-md drop-shadow-2xl shadow-lg justify-around mx-auto my-[15%] flex">
           <div className="lg:grid h-[80%] lg:grid-cols-12">
             <section className="relative flex items-end lg:col-span-5 lg:h-full xl:col-span-6">
-        
+              <img src="/fhir-bg.jpeg" className="absolute inset-0 h-full w-full object-cover rounded-s-md"/>
               <div className="hidden lg:relative lg:block lg:p-12">
 
                 <a className="block text-[#ba2a25] p-2" href="/">
@@ -90,22 +90,20 @@ const LoginPage = () => {
               className="flex items-center justify-center px-8 py-8 sm:px-12 lg:col-span-7 lg:px-16 lg:py-12 xl:col-span-6"
             >
               <div className="max-w-xl lg:max-w-3xl shadow-lg pb-5 px-3 rounded-md">
-                <div className="relative -mt-16 block lg:hidden">
+                <div className="relative -mt-16 block">
                   <a
                     className="inline-flex size-16 text-[#ba2a25] p-2 items-center justify-center sm:size-20"
-                    href="/"
+                    href="/home"
                   >
-                    {/* <span className="sr-only">Home</span> */}
-                    {/* <StoreIcon className="h-[4rem] w-fit"/> */}
+                    <span className="sr-only">Home</span>
 
                   </a>
 
                   <h1 className="mt-2 text-2xl font-bold text-white sm:text-3xl md:text-4xl">
-                    {/* Welcome to KASUWA<span className="inline-flex absolute mt-1 ml-1"><ShoppingBag /></span> */}
                   </h1>
 
                   <p className="mt-4 leading-relaxed text-white">
-                    H-Check, your AI-powered healthcare data querying tool that interfaces with FHIR-compliant systems
+                    <span className="text-green-600 font-bold">H-Check,</span>  your AI-powered healthcare data querying tool that interfaces with FHIR-compliant systems
                   </p>
                 </div>
 
@@ -143,7 +141,7 @@ const LoginPage = () => {
 
                   <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
                       <button
-                        className="inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-10 py-3 text-sm font-medium text-white transition hover:bg-transparent hover:text-blue-600 focus:outline-none focus:ring active:text-blue-500"
+                        className="inline-block shrink-0 rounded-md border border-green-600 bg-green-600 px-10 py-3 text-sm font-medium text-white transition hover:bg-transparent hover:text-green-600 focus:outline-none focus:ring active:text-green-500"
                         type="submit" aria-disabled={loading}
                       >
                         {loading ? <SpinnerLineWave /> : 'Login'}

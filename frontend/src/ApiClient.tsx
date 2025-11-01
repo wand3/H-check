@@ -133,6 +133,8 @@ export default class ApiClient {
   async logout() {
     await this.delete('/token');
     localStorage.removeItem('token');
+    localStorage.removeItem('authToken');
+
   }
 
   isAuthenticated() {

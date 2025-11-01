@@ -4,7 +4,6 @@ import type { RegisterUserInputSchema, RegisterUserOutputSchema, LoginUserInputS
 import Config from '../config';
 
 
-
 // register user thunk
 export const registerUser = createAsyncThunk<RegisterUserOutputSchema, RegisterUserInputSchema, { rejectValue: string}> (
   'auth/register',
@@ -72,4 +71,40 @@ export const loginUser = createAsyncThunk<
 }); 
 
 
+// Async thunk for logout
+// ArgType is void, ReturnType is void (or a simple success message)
+export const logoutUser = createAsyncThunk<void, void>(
+  'auth/logout',
+  async (_, { }) => {
+    try {
+      // Client-Side Side Effects (CRITICAL)
+      // Regardless of the backend call success/failure, clear the client-side state.
+      localStorage.removeItem('token'); 
+      localStorage.removeItem('authToken'); 
+      // Send request to the backend to invalidate the session/token (optional, but recommended)
 
+      // 3. Dispatch an action to clear the state in the Redux store
+      // This action (e.g., 'auth/clearState') is handled in your slice's reducer.
+      // We don't need to manually dispatch here, as the `pending/fulfilled/rejected`
+      // actions of this thunk will be handled by the reducer.
+    
+      // This is the same endpoint you defined in FastAPI: /auth/logout
+      await axios.post(`${Config.baseURL}/auth/logout`);
+      // const navigate = useNavigate();
+
+      return; // Returns nothing on success
+
+
+    } catch (error) {
+      // It's often acceptable to ignore the error on the client side 
+      // during logout, as the main goal is to clear the client's state.
+      console.error('Logout API call failed, proceeding with local clear:', error);
+      // You can choose to rejectWithValue if you need to display an error message
+    }
+    
+
+
+
+    
+  }
+);

@@ -1,8 +1,6 @@
 import Config from '../config';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { RootState } from '../store'; // Import your RootState type
- // Import your RootState type
-// Import your RootState type
 import type { UserInDBSchema } from '../schemas/user';
 
 export const authApi = createApi({
@@ -24,7 +22,19 @@ export const authApi = createApi({
         method: 'GET',
       }),
     }),
+
+    // Mutation: To log out the user
+    logout: builder.mutation<void, void>({ // <ResultType, ArgType>
+      // Clear stored tokens or session data
+      // localStorage.removeItem('authToken'),
+      // sessionStorage.clear(),
+      query: () => ({
+        url: `/auth/logout`, 
+        method: 'POST', // Use POST or DELETE for state-changing operations
+      }),
+      // Optional: Logic to clear state/cache can be added here or in an onQueryStarted
+    }),
   }),
 });
 
-export const { useGetUserDetailsQuery } = authApi; // Export the hook
+export const { useGetUserDetailsQuery, useLogoutMutation } = authApi; // Export the hook

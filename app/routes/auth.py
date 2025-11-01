@@ -13,6 +13,7 @@ from app.security import authenticate_user, create_access_token
 from app.logger import logger
 from ..config import Config
 from sqlalchemy import select
+from ..dependencies import get_current_active_user
 
 auth = APIRouter(tags=["Auth"])
 
@@ -135,3 +136,14 @@ async def check_email(
     existing_user = result.scalar_one_or_none()
 
     return {"exists": existing_user is not None}
+
+@auth.post("/auth/logout", status_code=status.HTTP_200_OK)
+async def logout_user(
+    current_user: UserBase = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_session),
+):
+    """
+    Logout user.
+    """
+    if not current_user:
+      return {"success": current_user is not None}
